@@ -1,0 +1,673 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Proveedores - Sistema de Inventario</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #e2e8f0;
+        }
+
+        .sidebar {
+            background-color: #0f172a;
+            border-right: 1px solid rgba(56,189,248,0.15);
+        }
+
+        .neon-card {
+            background-color: #111827;
+            border: 1px solid rgba(56,189,248,0.2);
+            box-shadow: 0 0 20px rgba(56,189,248,0.12);
+        }
+
+        .neon-btn {
+            background: linear-gradient(
+                135deg, #0ea5e9 0%, #6366f1 100%
+            );
+            box-shadow: 0 0 15px rgba(14,165,233,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .neon-btn:hover {
+            box-shadow: 0 0 25px rgba(14,165,233,0.6);
+            transform: translateY(-2px);
+        }
+
+        .campo {
+            width: 100%;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #e2e8f0;
+            outline: none;
+        }
+
+        .campo:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 8px rgba(56,189,248,0.2);
+        }
+
+        .campo::placeholder {
+            color: #64748b;
+        }
+
+        .tabla th {
+            background-color: #1e293b;
+            color: #7dd3fc;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .tabla td {
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .tabla tbody tr:hover {
+            background-color: #1e293b;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col md:flex-row">
+
+    <!-- MENU LATERAL -->
+    <aside class="sidebar w-full md:w-64 p-5
+                  flex flex-col justify-between shrink-0">
+
+        <div>
+            <h1 class="text-base font-bold text-sky-400 mb-8">
+                🚀 Traductores e Intérpretes II
+            </h1>
+
+            <nav class="space-y-2 text-sm">
+
+                <a href="index.html"
+                   class="flex items-center gap-3 px-3 py-2.5
+                          rounded-lg text-slate-400
+                          hover:bg-slate-800 transition">
+                    <span>🏠</span>
+                    <span>Inicio</span>
+                </a>
+
+                <a href="inventario.html"
+                   class="flex items-center gap-3 px-3 py-2.5
+                          rounded-lg text-slate-400
+                          hover:bg-slate-800 transition">
+                    <span>📦</span>
+                    <span>Inventario</span>
+                </a>
+
+                <a href="personal.html"
+                   class="flex items-center gap-3 px-3 py-2.5
+                          rounded-lg text-slate-400
+                          hover:bg-slate-800 transition">
+                    <span>👥</span>
+                    <span>Personal</span>
+                </a>
+
+                <a href="proveedores.html"
+                   class="flex items-center gap-3 px-3 py-2.5
+                          rounded-lg bg-slate-800 text-sky-400">
+                    <span>🚚</span>
+                    <span>Proveedores</span>
+                </a>
+
+                <a href="login.html"
+                   class="flex items-center gap-3 px-3 py-2.5
+                          rounded-lg text-slate-400
+                          hover:bg-slate-800 transition">
+                    <span>🔐</span>
+                    <span>Login</span>
+                </a>
+
+            </nav>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 p-4 md:p-8 min-w-0">
+
+        <header class="mb-8">
+            <h2 class="text-3xl font-bold text-sky-400">
+                🚚 Gestión de Proveedores
+            </h2>
+
+            <p class="text-slate-400 mt-2">
+                Administración y registro de proveedores
+                del mercadito.
+            </p>
+        </header>
+
+        <!-- FORMULARIO -->
+        <section class="neon-card p-6 rounded-2xl mb-8">
+
+            <h3 id="tituloFormulario"
+                class="text-xl font-bold text-sky-400 mb-6">
+                ➕ Registrar Proveedor
+            </h3>
+
+            <form id="formProveedor"
+                  class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                <div>
+                    <label class="block mb-2 text-sm">
+                        Código
+                    </label>
+
+                    <input type="text" id="codigo"
+                           class="campo opacity-60"
+                           placeholder="Autogenerado"
+                           readonly>
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm">
+                        Empresa *
+                    </label>
+
+                    <input type="text" id="empresa"
+                           class="campo"
+                           placeholder="Nombre de la empresa"
+                           maxlength="150" required>
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm">
+                        Representante
+                    </label>
+
+                    <input type="text" id="representante"
+                           class="campo"
+                           placeholder="Nombre del representante"
+                           maxlength="150">
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm">
+                        Encargado
+                    </label>
+
+                    <input type="text" id="encargado"
+                           class="campo"
+                           placeholder="Nombre del encargado"
+                           maxlength="150">
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm">
+                        Teléfono
+                    </label>
+
+                    <input type="tel" id="telefono"
+                           class="campo"
+                           placeholder="9999-9999"
+                           maxlength="20">
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm">
+                        Correo Electrónico
+                    </label>
+
+                    <input type="email" id="email"
+                           class="campo"
+                           placeholder="empresa@correo.com"
+                           maxlength="150">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block mb-2 text-sm">
+                        Dirección de la Empresa
+                    </label>
+
+                    <textarea id="direccion"
+                              class="campo"
+                              rows="3"
+                              placeholder="Dirección completa"></textarea>
+                </div>
+
+                <div class="md:col-span-2 flex flex-wrap gap-3">
+
+                    <button type="submit" id="btnGuardar"
+                            class="neon-btn px-6 py-3
+                                   rounded-lg font-bold text-white">
+                        💾 Guardar Proveedor
+                    </button>
+
+                    <button type="button" id="btnCancelar"
+                            class="bg-slate-700 hover:bg-slate-600
+                                   px-6 py-3 rounded-lg font-bold">
+                        Cancelar
+                    </button>
+
+                </div>
+            </form>
+
+            <p id="mensaje" role="status"
+               aria-live="polite"
+               class="mt-5 text-sm"></p>
+        </section>
+
+        <!-- LISTADO DE PROVEEDORES -->
+        <section class="neon-card p-6 rounded-2xl">
+
+            <div class="flex flex-col md:flex-row
+                        justify-between gap-4 mb-6">
+
+                <h3 class="text-xl font-bold text-sky-400">
+                    📋 Proveedores Registrados
+                </h3>
+
+                <input type="search" id="buscar"
+                       class="campo md:max-w-xs"
+                       placeholder="🔍 Buscar proveedor...">
+            </div>
+
+            <div class="overflow-x-auto">
+
+                <table class="tabla w-full text-sm">
+
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Empresa</th>
+                            <th>Representante</th>
+                            <th>Encargado</th>
+                            <th>Teléfono</th>
+                            <th>Dirección</th>
+                            <th>Email</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaProveedores">
+                        <tr>
+                            <td colspan="8"
+                                class="text-center text-slate-400">
+                                Cargando proveedores...
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <p id="totalProveedores"
+               class="text-slate-400 text-sm mt-4"></p>
+
+        </section>
+    </main>
+
+    <!-- JAVASCRIPT / SUPABASE -->
+    <script type="module">
+
+        import { supabase } from "./conexion.js";
+
+        const formulario =
+            document.getElementById("formProveedor");
+
+        const mensaje =
+            document.getElementById("mensaje");
+
+        const tabla =
+            document.getElementById("tablaProveedores");
+
+        const buscar =
+            document.getElementById("buscar");
+
+        const btnGuardar =
+            document.getElementById("btnGuardar");
+
+        let codigoEditar = null;
+        let proveedores = [];
+
+        // Mostrar mensajes
+        function mostrarMensaje(texto, error = false) {
+            mensaje.textContent = texto;
+            mensaje.className = error
+                ? "mt-5 text-sm text-red-400"
+                : "mt-5 text-sm text-green-400";
+        }
+
+        // Obtener datos del formulario
+        function obtenerDatos() {
+            return {
+                empresa:
+                    document.getElementById("empresa").value.trim(),
+
+                representante:
+                    document.getElementById("representante").value.trim(),
+
+                encargado:
+                    document.getElementById("encargado").value.trim(),
+
+                telefono:
+                    document.getElementById("telefono").value.trim(),
+
+                direccion_empresa:
+                    document.getElementById("direccion").value.trim(),
+
+                email:
+                    document.getElementById("email").value.trim() || null
+            };
+        }
+
+        // Guardar o actualizar proveedor
+        formulario.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const datos = obtenerDatos();
+
+            btnGuardar.disabled = true;
+            btnGuardar.textContent = "Procesando...";
+
+            try {
+                let resultado;
+
+                if (codigoEditar === null) {
+
+                    resultado = await supabase
+                        .from("proveedores")
+                        .insert([datos]);
+
+                } else {
+
+                    resultado = await supabase
+                        .from("proveedores")
+                        .update(datos)
+                        .eq("codigo", codigoEditar)
+                        .select("codigo");
+
+                }
+
+                if (resultado.error) {
+                    throw resultado.error;
+                }
+
+                if (codigoEditar !== null &&
+                    resultado.data.length === 0) {
+                    throw new Error(
+                        "No se actualizó ningún proveedor. " +
+                        "Verifica los permisos."
+                    );
+                }
+
+                const accion = codigoEditar === null
+                    ? "registrado"
+                    : "actualizado";
+
+                limpiarFormulario();
+
+                mostrarMensaje(
+                    "✅ Proveedor " + accion + " correctamente."
+                );
+
+                await cargarProveedores();
+
+            } catch (error) {
+
+                mostrarMensaje(
+                    "❌ Error: " + error.message, true
+                );
+
+            } finally {
+
+                btnGuardar.disabled = false;
+
+                btnGuardar.textContent =
+                    codigoEditar === null
+                    ? "💾 Guardar Proveedor"
+                    : "💾 Actualizar Proveedor";
+            }
+        });
+
+        // Consultar proveedores
+        async function cargarProveedores() {
+
+            const { data, error } = await supabase
+                .from("proveedores")
+                .select("*")
+                .order("codigo", { ascending: true });
+
+            if (error) {
+                mostrarMensaje(
+                    "❌ Error al consultar: " + error.message,
+                    true
+                );
+                return;
+            }
+
+            proveedores = data || [];
+            mostrarProveedores(proveedores);
+        }
+
+        // Mostrar proveedores en tabla
+        function mostrarProveedores(lista) {
+
+            tabla.replaceChildren();
+
+            if (lista.length === 0) {
+                const fila = tabla.insertRow();
+                const celda = fila.insertCell();
+
+                celda.colSpan = 8;
+                celda.className =
+                    "text-center text-slate-400";
+
+                celda.textContent =
+                    "No hay proveedores registrados.";
+
+            } else {
+
+                lista.forEach(proveedor => {
+
+                    const fila = tabla.insertRow();
+
+                    const campos = [
+                        proveedor.codigo,
+                        proveedor.empresa,
+                        proveedor.representante,
+                        proveedor.encargado,
+                        proveedor.telefono,
+                        proveedor.direccion_empresa,
+                        proveedor.email
+                    ];
+
+                    campos.forEach(valor => {
+                        const celda = fila.insertCell();
+                        celda.textContent = valor ?? "-";
+                    });
+
+                    const acciones = fila.insertCell();
+
+                    const btnEditar =
+                        document.createElement("button");
+
+                    btnEditar.textContent = "✏️ Editar";
+                    btnEditar.className =
+                        "bg-blue-600 hover:bg-blue-700 " +
+                        "px-3 py-2 rounded-lg mr-2 mb-1";
+
+                    btnEditar.addEventListener("click", () => {
+                        editarProveedor(proveedor.codigo);
+                    });
+
+                    const btnEliminar =
+                        document.createElement("button");
+
+                    btnEliminar.textContent = "🗑️ Eliminar";
+                    btnEliminar.className =
+                        "bg-red-600 hover:bg-red-700 " +
+                        "px-3 py-2 rounded-lg";
+
+                    btnEliminar.addEventListener("click", () => {
+                        eliminarProveedor(proveedor.codigo);
+                    });
+
+                    acciones.append(btnEditar, btnEliminar);
+                });
+            }
+
+            document.getElementById(
+                "totalProveedores"
+            ).textContent =
+                "Proveedores mostrados: " + lista.length;
+        }
+
+        // Editar proveedor
+        function editarProveedor(codigo) {
+
+            const proveedor = proveedores.find(
+                p => p.codigo === codigo
+            );
+
+            if (!proveedor) return;
+
+            codigoEditar = codigo;
+
+            document.getElementById("codigo").value =
+                proveedor.codigo;
+
+            document.getElementById("empresa").value =
+                proveedor.empresa || "";
+
+            document.getElementById("representante").value =
+                proveedor.representante || "";
+
+            document.getElementById("encargado").value =
+                proveedor.encargado || "";
+
+            document.getElementById("telefono").value =
+                proveedor.telefono || "";
+
+            document.getElementById("direccion").value =
+                proveedor.direccion_empresa || "";
+
+            document.getElementById("email").value =
+                proveedor.email || "";
+
+            document.getElementById(
+                "tituloFormulario"
+            ).textContent = "✏️ Editar Proveedor";
+
+            btnGuardar.textContent =
+                "💾 Actualizar Proveedor";
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        }
+
+        // Eliminar proveedor
+        async function eliminarProveedor(codigo) {
+
+            const confirmar = confirm(
+                "¿Deseas eliminar el proveedor " +
+                codigo + "?"
+            );
+
+            if (!confirmar) return;
+
+            try {
+
+                const { data, error } = await supabase
+                    .from("proveedores")
+                    .delete()
+                    .eq("codigo", codigo)
+                    .select("codigo");
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    throw new Error(
+                        "No se eliminó ningún registro. " +
+                        "Verifica los permisos."
+                    );
+                }
+
+                if (codigoEditar === codigo) {
+                    limpiarFormulario();
+                }
+
+                mostrarMensaje(
+                    "✅ Proveedor eliminado correctamente."
+                );
+
+                await cargarProveedores();
+
+            } catch (error) {
+
+                mostrarMensaje(
+                    "❌ Error: " + error.message, true
+                );
+            }
+        }
+
+        // Buscar proveedores
+        buscar.addEventListener("input", () => {
+
+            const texto = buscar.value
+                .toLowerCase()
+                .trim();
+
+            const filtrados = proveedores.filter(p => {
+
+                return [
+                    p.codigo,
+                    p.empresa,
+                    p.representante,
+                    p.encargado,
+                    p.telefono,
+                    p.email
+                ].some(valor =>
+                    String(valor ?? "")
+                        .toLowerCase()
+                        .includes(texto)
+                );
+
+            });
+
+            mostrarProveedores(filtrados);
+        });
+
+        // Limpiar formulario
+        function limpiarFormulario() {
+
+            formulario.reset();
+            codigoEditar = null;
+
+            document.getElementById("codigo").value = "";
+
+            document.getElementById(
+                "tituloFormulario"
+            ).textContent = "➕ Registrar Proveedor";
+
+            btnGuardar.textContent =
+                "💾 Guardar Proveedor";
+        }
+
+        document.getElementById(
+            "btnCancelar"
+        ).addEventListener("click", () => {
+            limpiarFormulario();
+            mensaje.textContent = "";
+        });
+
+        // Cargar proveedores al abrir la página
+        cargarProveedores();
+
+    </script>
+
+</body>
+</html>
