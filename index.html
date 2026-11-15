@@ -74,6 +74,60 @@ flex flex-col md:flex-row>: Columna en celular, fija en PC(menu izquierda)
             </p>
         </div>
      </main>
+
+    <!-- CONEXIÓN A SUPABASE -->
+    <script type="module">
+
+        import { supabase } from "./conexion.js";
+
+        async function verificarConexion() {
+
+            const estado = document.getElementById(
+                "estadoConexion"
+            );
+
+            try {
+
+                const { error } = await supabase
+                    .from("productos")
+                    .select("codigo")
+                    .limit(1);
+
+                if (error) {
+                    estado.textContent =
+                        "⚠️ No se pudo consultar productos: "
+                        + error.message;
+
+                    estado.className =
+                        "text-yellow-400 mt-2";
+
+                } else {
+
+                    estado.textContent =
+                        "✅ Consulta a Supabase exitosa";
+
+                    estado.className =
+                        "text-green-400 mt-2";
+                }
+
+            } catch (error) {
+
+                estado.textContent =
+                    "❌ Error de conexión: "
+                    + error.message;
+
+                estado.className =
+                    "text-red-400 mt-2";
+            }
+        }
+
+        verificarConexion();
+
+    </script>
+
+</body>
+</html>
+
 </body>
 
 </html>
