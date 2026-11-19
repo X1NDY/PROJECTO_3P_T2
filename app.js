@@ -1,16 +1,9 @@
-import { supabase } from "./conexion.js";
+/* ==========================================================================
+   PASO 1: CONFIGURACIÓN DE LA CONEXIÓN A SUPABASE
+   ========================================================================== */
+const SUPABASE_URL = "https://nakggxqpmnyiufhtwscn.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_jdbt3wTQ1HiNcYjDcYzerQ_xLmvNN9P";
 
-async function probarConexion() {
-  const { data, error } = await supabase
-    .from("productos")
-    .select("*");
+// Iniciamos el cliente de Supabase para conectar la web con la nube
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  if (error) {
-    console.error("Error al consultar Supabase:", error.message);
-    return;
-  }
-
-  console.table(data);
-}
-
-probarConexion();
