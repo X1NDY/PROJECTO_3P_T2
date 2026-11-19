@@ -17,7 +17,7 @@ function entorno() {
         setAttribute() {}, focus() {}, scrollIntoView() {}, remove() {} });
     const nodes = Object.fromEntries([...campos, 'personalForm', 'guardarPersonal',
         'cancelarPersonal', 'tituloPersonal', 'personalTableBody', 'recargarPersonal',
-        'totalPersonal'].map(id => [id, element()]));
+        'totalPersonal', 'buscarPersonal'].map(id => [id, element()]));
     nodes.personalForm.reset = () => campos.forEach(campo => nodes[campo].value = '');
     nodes.personalForm.reportValidity = () => true;
     const calls = [];
@@ -113,4 +113,27 @@ test('errores y operaciones sin registros afectados conservan la edición', asyn
     await remove(env);
     assert.equal(env.nodes.identidad.readOnly, true);
     assert.equal(env.nodes.guardarPersonal.disabled, false);
+});
+
+
+test('busca personal, muestra coincidencias y conserva el filtro al actualizar', async () => {
+    const env = entorno();
+    await settle();
+    const buscar = env.nodes.buscarPersonal;
+    for (const texto of [' ANA LÓPEZ ', '001234', '9999', 'centro']) {
+        buscar.value = texto;
+        buscar.listeners.input();
+        assert.equal(env.nodes.totalPersonal.textContent, '1 de 1 registros');
+        assert.equal(env.nodes.personalTableBody.children[0].children.length, 6);
+    }
+    buscar.value = 'sin coincidencias';
+    buscar.listeners.input();
+    assert.equal(env.nodes.totalPersonal.textContent, '0 de 1 registros');
+    assert.match(env.nodes.personalTableBody.children[0].children[0].textContent, /No se encontró/);
+    await env.nodes.recargarPersonal.listeners.click();
+    assert.equal(env.nodes.totalPersonal.textContent, '0 de 1 registros');
+    buscar.value = '';
+    buscar.listeners.input();
+    assert.equal(env.nodes.totalPersonal.textContent, '1 registros');
+    assert.equal(env.nodes.personalTableBody.children[0].children.length, 6);
 });

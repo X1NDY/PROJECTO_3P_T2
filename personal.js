@@ -6,6 +6,7 @@ import { supabase as supabaseClient } from "./conexion.js";
 
 let identidadEditando = null;
 let guardando = false;
+let personalRegistrado = [];
 const camposPersonal = ["identidad", "nombres", "apellidos", "genero", "telefono", "direccion"];
 
 function cancelarEdicionPersonal() {
@@ -87,6 +88,56 @@ function mostrarEstadoTabla(mensaje, esError = false) {
     tableBody.replaceChildren(fila);
 }
 
+function mostrarPersonal() {
+    const texto = document.getElementById("buscarPersonal").value.trim().toLowerCase();
+    const personal = personalRegistrado.filter(persona =>
+        [persona.identidad, `${persona.nombres ?? ""} ${persona.apellidos ?? ""}`,
+            persona.genero, persona.telefono, persona.direccion].some(valor =>
+            String(valor ?? "").toLowerCase().includes(texto))
+    );
+    document.getElementById("totalPersonal").textContent = texto
+        ? `${personal.length} de ${personalRegistrado.length} registros`
+        : `${personal.length} registros`;
+    if (personal.length === 0) {
+        mostrarEstadoTabla(texto ? "No se encontró personal con esa búsqueda." : "No hay personal registrado.");
+        return;
+    }
+    const tableBody = document.getElementById("personalTableBody");
+    tableBody.replaceChildren();
+    personal.forEach(persona => {
+        const fila = document.createElement("tr");
+        fila.className = "border-b border-slate-800/60 hover:bg-slate-800/30 transition";
+        const valores = [persona.identidad, `${persona.nombres} ${persona.apellidos}`,
+            persona.genero, persona.telefono, persona.direccion];
+        // Nombres y apellidos se muestran juntos.
+        valores.forEach(valor => {
+            const celda = document.createElement("td");
+            celda.className = "py-3 px-3 text-slate-200 break-words max-w-xs";
+            celda.textContent = valor;
+            fila.appendChild(celda);
+        });
+        const acciones = document.createElement("td");
+        acciones.className = "whitespace-nowrap";
+        for (const [texto, clase, accion] of [
+            ["✏️ Editar", "boton-editar", () => editarPersonal(persona)],
+            ["🗑️ Eliminar", "boton-eliminar", () => eliminarPersonal(persona)]
+        ]) {
+            const boton = document.createElement("button");
+            boton.type = "button";
+            boton.className = clase;
+            boton.textContent = texto;
+            boton.addEventListener("click", async () => {
+                if (guardando) return;
+                boton.disabled = true;
+                try { await accion(); } finally { boton.disabled = false; }
+            });
+            acciones.appendChild(boton);
+        }
+        fila.appendChild(acciones);
+        tableBody.appendChild(fila);
+    });
+}
+
 async function cargarPersonal() {
     mostrarEstadoTabla("Cargando personal desde Supabase...");
     const boton = document.getElementById("recargarPersonal");
@@ -98,45 +149,8 @@ async function cargarPersonal() {
             .select("identidad, nombres, apellidos, genero, telefono, direccion")
             .order("apellidos", { ascending: true });
         if (error) throw error;
-        document.getElementById("totalPersonal").textContent = `${personal.length} registros`;
-        if (personal.length === 0) {
-            mostrarEstadoTabla("No hay personal registrado.");
-            return;
-        }
-        const tableBody = document.getElementById("personalTableBody");
-        tableBody.replaceChildren();
-        personal.forEach(persona => {
-            const fila = document.createElement("tr");
-            fila.className = "border-b border-slate-800/60 hover:bg-slate-800/30 transition";
-            const valores = [persona.identidad, `${persona.nombres} ${persona.apellidos}`,
-                persona.genero, persona.telefono, persona.direccion];
-            // Nombres y apellidos se muestran juntos.
-            valores.forEach(valor => {
-                const celda = document.createElement("td");
-                celda.className = "py-3 px-3 text-slate-200 break-words max-w-xs";
-                celda.textContent = valor;
-                fila.appendChild(celda);
-            });
-            const acciones = document.createElement("td");
-            acciones.className = "whitespace-nowrap";
-            for (const [texto, clase, accion] of [
-                ["✏️ Editar", "boton-editar", () => editarPersonal(persona)],
-                ["🗑️ Eliminar", "boton-eliminar", () => eliminarPersonal(persona)]
-            ]) {
-                const boton = document.createElement("button");
-                boton.type = "button";
-                boton.className = clase;
-                boton.textContent = texto;
-                boton.addEventListener("click", async () => {
-                    if (guardando) return;
-                    boton.disabled = true;
-                    try { await accion(); } finally { boton.disabled = false; }
-                });
-                acciones.appendChild(boton);
-            }
-            fila.appendChild(acciones);
-            tableBody.appendChild(fila);
-        });
+        personalRegistrado = personal || [];
+        mostrarPersonal();
     } catch (error) {
         document.getElementById("totalPersonal").textContent = "Sin conexión";
         mostrarEstadoTabla("No se pudo cargar el personal. Pulsa Actualizar para reintentar.", true);
@@ -195,6 +209,8 @@ document.addEventListener("DOMContentLoaded", () => {
             boton.textContent = identidadEditando === null ? "Guardar Personal" : "Actualizar Personal";
         }
     });
+
+    document.getElementById("buscarPersonal").addEventListener("input", mostrarPersonal);
 
     // PASO 5: Carga inicial y actualización manual del listado.
     document.getElementById("recargarPersonal").addEventListener("click", cargarPersonal);
