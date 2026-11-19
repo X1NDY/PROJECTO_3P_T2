@@ -1,21 +1,23 @@
 /* ==========================================================================
    PASO 1: CONFIGURACIÓN DE LA CONEXIÓN A SUPABASE
    ========================================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+const formulario = document.getElementById("productForm");
+// Inicio también carga este archivo, pero no contiene el formulario de inventario.
+if (!formulario) return;
+
+const botonGuardar = formulario.querySelector('button[type="submit"]');
+const botonCancelar = document.getElementById("cancelarEdicion");
+let idProductoEditando = null;
+let guardando = false;
+
 const SUPABASE_URL = "https://nakggxqpmnyiufhtwscn.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_jdbt3wTQ1HiNcYjDcYzerQ_xLmvNN9P";
 
 // Iniciamos el cliente de Supabase para conectar la web con la nube
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-<<<<<<< HEAD
-=======
-  if (error) {
-    console.error("Error al consultar Supabase:", error.message);
-    return;
-  }
-
-  console.table(data);
-}
+const supabaseClient = window.supabase
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
 
 function mostrarNotificacion(mensaje, tipo = "success") {
     const aviso = document.createElement("div");
@@ -151,5 +153,4 @@ async function eliminarProducto(id) {
 
 botonCancelar.addEventListener("click", cancelarEdicion);
 cargarInventario();
-probarConexion();
->>>>>>> 1fc970fcfcd42658cd7943654b5166d668457ce4
+});
