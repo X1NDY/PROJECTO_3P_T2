@@ -18,14 +18,14 @@
         <form id="loginForm" class="space-y-5">
 
             <div>
-                <label class="block mb-2">Correo electrónico</label>
-                <input id="email" type="email" required
+                <label for="email" class="block mb-2">Correo electrónico</label>
+                <input id="email" name="email" type="email" autocomplete="username" required
                     class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700">
             </div>
 
             <div>
-                <label class="block mb-2">Contraseña</label>
-                <input id="password" type="password" required
+                <label for="password" class="block mb-2">Contraseña</label>
+                <input id="password" name="password" type="password" autocomplete="current-password" required
                     class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700">
             </div>
 
@@ -41,7 +41,7 @@
 
         </form>
 
-        <p id="message" class="mt-4 text-center text-sm"></p>
+        <p id="message" role="status" aria-live="polite" class="mt-4 text-center text-sm"></p>
 
     </div>
 
@@ -49,8 +49,8 @@
 
     <script>
         // Datos de conexión de Supabase
-        const SUPABASE_URL = "https://tabxpcvknbhzrcfxviol.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable__-EQTX6HhRPdmydpAjfIQg_plxACJ3x";
+        const SUPABASE_URL = "https://nakggxqpmnyiufhtwscn.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_jdbt3wTQ1HiNcYjDcYzerQ_xLmvNN9P";
 
         // Crear conexión  
     const supabaseClient = window.supabase.createClient(
@@ -58,39 +58,52 @@
         SUPABASE_ANON_KEY
 );
 
-console.log("Supabase está conectado correctamente");
+const loginForm = document.getElementById("loginForm");
+const botonLogin = loginForm.querySelector('button[type="submit"]');
 
-
-
-// Obtener el formulario
-const loginForm = document.querySelector("form");
-
-// Escuchar cuando se presione Iniciar sesión
 loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (botonLogin.disabled || !loginForm.reportValidity()) return;
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
     const message = document.getElementById("message");
 
+    botonLogin.disabled = true;
     message.textContent = "Iniciando sesión...";
-    message.style.color = "blue";
+    message.style.color = "#38bdf8";
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: email,
-    password: password
-});
+    try {
+        const recordar = document.getElementById("remember").checked;
+        const { data, error } = await supabaseClient.rpc("iniciar_sesion_usuario", {
+            p_correo: email,
+            p_contrasena: password,
+            p_recordar: recordar
+        });
 
-    if (error) {
-        message.textContent = "Correo o contraseña incorrectos.";
-        message.style.color = "red";
-        return;
+        if (error || !data?.token) {
+            message.textContent = error?.code === "PGRST202"
+                ? "Falta configurar el acceso de usuarios en Supabase."
+                : "Correo o contraseña incorrectos. La cuenta debe tener una contraseña y un correo único.";
+            message.style.color = "#f87171";
+            return;
+        }
+
+        localStorage.removeItem("sesion_usuarios");
+        sessionStorage.removeItem("sesion_usuarios");
+        const almacenamiento = recordar ? localStorage : sessionStorage;
+        almacenamiento.setItem("sesion_usuarios", data.token);
+        document.getElementById("password").value = "";
+
+        message.textContent = "¡Inicio de sesión exitoso!";
+        message.style.color = "#34d399";
+        window.location.replace("index.html");
+    } catch (error) {
+        message.textContent = "No se pudo conectar. Revisa tu conexión e inténtalo de nuevo.";
+        message.style.color = "#f87171";
+    } finally {
+        botonLogin.disabled = false;
     }
-
-    message.textContent = "¡Inicio de sesión exitoso!";
-    message.style.color = "green";
-
-    window.location.href = "index.html";
 });
 
     </script>
