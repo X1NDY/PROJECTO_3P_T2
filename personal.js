@@ -1,10 +1,8 @@
 /* ==========================================================================
    PASO 1: CONFIGURACIÓN DE LA CONEXIÓN A SUPABASE
-   Usamos la misma base de datos del inventario.
+   Usamos la conexión compartida con Proveedores.
    ========================================================================== */
-const SUPABASE_UR = "https://jvffbhxsnlerrayaewpm.supabase.co";
-const SUPA_ANON_KEY = "sb_publishable_2wFcBreVe81GVigRE_0LEw_yeCzu2kR";
-const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_UR, SUPA_ANON_KEY) : null;
+import { supabase as supabaseClient } from "./conexion.js";
 
 /* ==========================================================================
    PASO 2: NOTIFICACIONES VISUALES NEÓN
