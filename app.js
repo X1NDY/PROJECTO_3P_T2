@@ -8,7 +8,7 @@ if (!formulario) return;
 
 const botonGuardar = formulario.querySelector('button[type="submit"]');
 const botonCancelar = document.getElementById("cancelarEdicion");
-let idProductoEditando = null;
+let codigoProductoEditando = null;
 let guardando = false;
 
 const SUPABASE_URL = "https://nakggxqpmnyiufhtwscn.supabase.co";
@@ -42,7 +42,7 @@ async function cargarInventario() {
     mostrarEstado("Cargando inventario...");
     try {
         if (!supabaseClient) throw new Error("No se pudo cargar Supabase. Recarga la página.");
-        const { data, error } = await supabaseClient.from("productos").select("*").order("id", { ascending: false });
+        const { data, error } = await supabaseClient.from("inventario").select("codigo, nombre, cantidad, precio").order("codigo", { ascending: false });
         if (error) throw error;
         if (!data || data.length === 0) {
             mostrarEstado("No hay productos registrados.");
@@ -63,7 +63,7 @@ async function cargarInventario() {
             acciones.className = "py-3 px-2 text-center space-x-2";
             for (const [texto, accion] of [
                 ["Editar", () => prepararEdicion(producto)],
-                ["Eliminar", () => eliminarProducto(producto.id)]
+                ["Eliminar", () => eliminarProducto(producto.codigo)]
             ]) {
                 const boton = document.createElement("button");
                 boton.type = "button";
@@ -80,20 +80,22 @@ async function cargarInventario() {
             tabla.appendChild(fila);
         });
     } catch (error) {
-        mostrarEstado("No se pudo cargar el inventario. Recarga la página para reintentar.");
+        mostrarEstado(error.code === "PGRST205"
+            ? "Falta crear la tabla inventario en Supabase. Ejecuta el archivo inventario.sql."
+            : "No se pudo cargar el inventario. Recarga la página para reintentar.");
         mostrarNotificacion(error.message, "error");
     }
 }
 
 function cancelarEdicion() {
-    idProductoEditando = null;
+    codigoProductoEditando = null;
     formulario.reset();
     botonGuardar.textContent = "Guardar Producto";
     botonCancelar.hidden = true;
 }
 
 function prepararEdicion(producto) {
-    idProductoEditando = producto.id;
+    codigoProductoEditando = producto.codigo;
     for (const campo of ["nombre", "cantidad", "precio"]) {
         document.getElementById(campo).value = producto[campo];
     }
@@ -109,8 +111,8 @@ formulario.addEventListener("submit", async evento => {
     const nombre = document.getElementById("nombre").value.trim();
     const cantidad = Number(document.getElementById("cantidad").value);
     const precio = Number(document.getElementById("precio").value);
-    if (!nombre || !Number.isSafeInteger(cantidad) || cantidad < 0 || !Number.isFinite(precio) || precio < 0) {
-        mostrarNotificacion("Ingresa un nombre, una cantidad entera y un precio no negativo.", "error");
+    if (!nombre || !Number.isSafeInteger(cantidad) || cantidad < 0 || cantidad > 2147483647 || !Number.isFinite(precio) || precio < 0 || precio > 99999999.99) {
+        mostrarNotificacion("Ingresa un nombre, una cantidad entre 0 y 2147483647 y un precio entre 0 y 99999999.99.", "error");
         return;
     }
     guardando = true;
@@ -120,11 +122,12 @@ formulario.addEventListener("submit", async evento => {
     try {
         if (!supabaseClient) throw new Error("No se pudo cargar Supabase. Recarga la página.");
         const producto = { nombre, cantidad, precio };
-        const consulta = idProductoEditando === null
-            ? supabaseClient.from("productos").insert([producto])
-            : supabaseClient.from("productos").update(producto).eq("id", idProductoEditando);
-        const { error } = await consulta;
+        const consulta = codigoProductoEditando === null
+            ? supabaseClient.from("inventario").insert([producto]).select("codigo")
+            : supabaseClient.from("inventario").update(producto).eq("codigo", codigoProductoEditando).select("codigo");
+        const { data, error } = await consulta;
         if (error) throw error;
+        if (!data?.length) throw new Error("No se guardó el producto. Actualiza la página y verifica los permisos.");
         cancelarEdicion();
         mostrarNotificacion("Producto guardado correctamente.");
         await cargarInventario();
@@ -134,20 +137,28 @@ formulario.addEventListener("submit", async evento => {
         guardando = false;
         botonGuardar.disabled = false;
         botonCancelar.disabled = false;
-        botonGuardar.textContent = idProductoEditando === null ? "Guardar Producto" : "Actualizar Producto";
+        botonGuardar.textContent = codigoProductoEditando === null ? "Guardar Producto" : "Actualizar Producto";
     }
 });
 
-async function eliminarProducto(id) {
-    if (!confirm("¿Deseas eliminar este producto?")) return;
+async function eliminarProducto(codigo) {
+    if (guardando || !confirm("¿Deseas eliminar este producto?")) return;
+    guardando = true;
+    botonGuardar.disabled = true;
+    botonCancelar.disabled = true;
     try {
-        const { error } = await supabaseClient.from("productos").delete().eq("id", id);
+        const { data, error } = await supabaseClient.from("inventario").delete().eq("codigo", codigo).select("codigo");
         if (error) throw error;
-        if (idProductoEditando === id) cancelarEdicion();
+        if (!data?.length) throw new Error("No se eliminó el producto. Actualiza la página y verifica los permisos.");
+        if (codigoProductoEditando === codigo) cancelarEdicion();
         mostrarNotificacion("Producto eliminado correctamente.");
         await cargarInventario();
     } catch (error) {
         mostrarNotificacion("Error al eliminar: " + error.message, "error");
+    } finally {
+        guardando = false;
+        botonGuardar.disabled = false;
+        botonCancelar.disabled = false;
     }
 }
 
