@@ -1,183 +1,371 @@
+import { supabase } from "./conexion.js";
 
-/* ==========================================================================
-   PASO 2: FUNCIÓN AUXILIAR PARA NOTIFICACIONES VISUALES NEÓN
-   Crea alertas flotantes modernas en lugar del aburrido "localhost dice..."
-   ========================================================================== */
-function mostrarNotificacion(mensaje, tipo = "success") {
-    const notificacion = document.createElement("div");
-    
-    // Asignamos colores según el tipo (éxito verde o error rojo)
-    const colorFondo = tipo === "success" 
-        ? "bg-emerald-950/90 border-emerald-500/50 text-emerald-300" 
-        : "bg-red-950/90 border-red-500/50 text-red-300";
-    
-    notificacion.className = `fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur text-sm font-medium transition-all duration-300 ${colorFondo}`;
-    notificacion.innerHTML = `<span>${tipo === "success" ? "✅" : "⚠️"}</span> ${mensaje}`;
-    
-    document.body.appendChild(notificacion);
+const formulario =
+    document.getElementById("formProveedor");
 
-    // Se desvanece y desaparece automáticamente a los 3 segundos
-    setTimeout(() => {
-        notificacion.style.opacity = "0";
-        setTimeout(() => notificacion.remove(), 300);
-    }, 3000);
+const mensaje =
+    document.getElementById("mensaje");
+
+const tabla =
+    document.getElementById("tablaProveedores");
+
+const buscar =
+    document.getElementById("buscar");
+
+const btnGuardar =
+    document.getElementById("btnGuardar");
+
+let codigoEditar = null;
+let proveedores = [];
+
+// Mostrar mensajes
+function mostrarMensaje(texto, error = false) {
+    mensaje.textContent = texto;
+    mensaje.className = error
+        ? "mt-5 text-sm text-red-400"
+        : "mt-5 text-sm text-green-400";
 }
 
-/* ==========================================================================
-   PASO 3: MOSTRAR EL INVENTARIO (Función Leer / Consultar)
-   Trae los datos desde la nube de Supabase y los dibuja en la tabla HTML.
-   ========================================================================== */
-async function cargarInventario() {
-    const tableBody = document.getElementById("productTableBody");
-    if (!tableBody) return; // Si no estamos en la página de inventario, se detiene aquí
+// Obtener datos del formulario
+function obtenerDatos() {
+    return {
+        empresa:
+            document.getElementById("empresa").value.trim(),
 
-    // Mensaje temporal de carga
-    tableBody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-500">Cargando datos desde la nube Supabase...</td></tr>`;
+        representante:
+            document.getElementById("representante").value.trim(),
 
-    // Consultamos la tabla 'productos' en Supabase ordenados por ID descendiente
-    const { data: productos, error } = await supabaseClient
-        .from('productos')
-        .select('*')
-        .order('id', { ascending: false });
+        encargado:
+            document.getElementById("encargado").value.trim(),
 
-    if (error) {
-        console.error("Error al cargar:", error);
-        tableBody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-red-400">Error al cargar los datos de Inventario.</td></tr>`;
+        telefono:
+            document.getElementById("telefono").value.trim(),
+
+        direccion_empresa:
+            document.getElementById("direccion").value.trim(),
+
+        email:
+            document.getElementById("email").value.trim() || null
+    };
+}
+
+// Guardar o actualizar proveedor
+formulario.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (btnGuardar.disabled || !formulario.reportValidity()) return;
+
+    const codigo = document.getElementById("codigo").value.trim();
+    if (!/^[0-9]+$/.test(codigo) || BigInt(codigo) > 9223372036854775807n) {
+        mostrarMensaje("El código debe ser un entero entre 0 y 9223372036854775807.", true);
         return;
     }
 
-    if (!productos || productos.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-500">No hay productos registrados.</td></tr>`;
+    const datos = obtenerDatos();
+    if (!datos.empresa) {
+        mostrarMensaje("Ingresa el nombre de la empresa.", true);
         return;
     }
 
-    tableBody.innerHTML = ""; // Limpiamos la tabla antes de rellenar
+    btnGuardar.disabled = true;
+    btnGuardar.textContent = "Procesando...";
 
-    productos.forEach(producto => {
-        const fila = document.createElement("tr");
-        fila.className = "border-b border-slate-800/60 hover:bg-slate-800/30 transition"; 
-        
-        fila.innerHTML = `
-            <td class="py-3 px-2 font-medium text-slate-200">${producto.nombre}</td>
-            <td class="py-3 px-2 font-medium text-slate-300">${producto.cantidad}</td>
-            <td class="py-3 px-2 font-medium text-sky-400">L${Number(producto.precio).toFixed(2)}</td>
-            <td class="py-3 px-2 text-center space-x-2">
-                <!-- Botón Editar -->
-                <button onclick="prepararEdicion(${producto.id}, '${producto.nombre}', ${producto.cantidad}, ${producto.precio})" 
-                        class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-1 rounded hover:bg-amber-500/20 transition">
-                    Editar
-                </button>
-                <!-- Botón Eliminar -->
-                <button onclick="eliminarProducto(${producto.id})" 
-                        class="text-xs bg-red-500/10 text-red-400 border border-red-500/30 px-2 py-1 rounded hover:bg-red-500/20 transition">
-                    Eliminar
-                </button>
-            </td>
-        `;
-        tableBody.appendChild(fila);
-    });
-}
+    try {
+        let resultado;
 
-/* ==========================================================================
-   PASO 4: GUARDAR O ACTUALIZAR PRODUCTOS (Crear / Modificar)
-   Maneja el evento submit del formulario de registro.
-   ========================================================================== */
-const formulario = document.getElementById("productForm");
+        if (codigoEditar === null) {
 
-if (formulario) {
-    formulario.addEventListener("submit", async (evento) => {
-        evento.preventDefault(); // Evita que la página se recargue por defecto
+            resultado = await supabase
+                .from("proveedores")
+                .insert([{ codigo, ...datos }]);
 
-        const nombreIngresado = document.getElementById("nombre").value;
-        const cantidadIngresada = document.getElementById("cantidad").value;
-        const precioIngresado = document.getElementById("precio").value;
-
-        if (idProductoEditando === null) {
-            // --- MODO CREAR (Nuevo producto) ---
-            const { error } = await supabaseClient
-                .from('productos')
-                .insert([{
-                    nombre: nombreIngresado,
-                    cantidad: parseInt(cantidadIngresada),
-                    precio: parseFloat(precioIngresado)
-                }]);
-
-            if (error) {
-                mostrarNotificacion("Error al guardar: " + error.message, "error");
-                console.error(error);
-            } else {
-                mostrarNotificacion("¡Producto guardado con éxito en la nube!", "success");
-                formulario.reset();
-                cargarInventario(); 
-            }
         } else {
-            // --- MODO ACTUALIZAR (Modificar producto existente) ---
-            const { error } = await supabaseClient
-                .from('productos')
-                .update({
-                    nombre: nombreIngresado,
-                    cantidad: parseInt(cantidadIngresada),
-                    precio: parseFloat(precioIngresado)
-                })
-                .eq('id', idProductoEditando);
 
-            if (error) {
-                mostrarNotificacion("Error al actualizar: " + error.message, "error");
-            } else {
-                mostrarNotificacion("¡Producto actualizado con éxito!", "success");
-                formulario.reset();
-                idProductoEditando = null;
-                
-                // Regresamos el texto original del botón
-                document.querySelector("#productForm button[type='submit']").textContent = "Guardar Producto";
-                cargarInventario();
-            }
+            resultado = await supabase
+                .from("proveedores")
+                .update(datos)
+                .eq("codigo", codigoEditar)
+                .select("codigo");
+
         }
-    });
-}
 
-/* ==========================================================================
-   PASO 5: ELIMINAR UN PRODUCTO (Borrar)
-   ========================================================================== */
-async function eliminarProducto(id) {
-    if (confirm("¿Estás seguro de que deseas eliminar este producto?")) {
-        const { error } = await supabaseClient
-            .from('productos')
-            .delete()
-            .eq('id', id);
-
-        if (error) {
-            mostrarNotificacion("Error al eliminar: " + error.message, "error");
-        } else {
-            mostrarNotificacion("¡Producto eliminado correctamente!", "success");
-            cargarInventario();
+        if (resultado.error) {
+            throw resultado.error;
         }
-    }
-}
 
-/* ==========================================================================
-   PASO 6: PREPARAR EDICIÓN
-   Carga los datos del producto seleccionado de vuelta en las cajas del formulario.
-   ========================================================================== */
-function prepararEdicion(id, nombre, cantidad, precio) {
-    idProductoEditando = id;
+        if (codigoEditar !== null &&
+            resultado.data.length === 0) {
+            throw new Error(
+                "No se actualizó ningún proveedor. " +
+                "Verifica los permisos."
+            );
+        }
 
-    document.getElementById("nombre").value = nombre;
-    document.getElementById("cantidad").value = cantidad;
-    document.getElementById("precio").value = precio;
+        const accion = codigoEditar === null
+            ? "registrado"
+            : "actualizado";
 
-    const botonSubmit = document.querySelector("#productForm button[type='submit']");
-    botonSubmit.textContent = "Actualizar Producto";
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+        limpiarFormulario();
 
-/* ==========================================================================
-   PASO 7: EJECUCION AUTOMATICA AL CARGAR LA PAGINA
-   ========================================================================== */
-document.addEventListener("DOMContentLoaded", () => {
-    // Si la tabla existe en la página actual, cargamos los datos automáticamente
-    if (document.getElementById("productTableBody")) {
-        cargarInventario();
+        mostrarMensaje(
+            "✅ Proveedor " + accion + " correctamente."
+        );
+
+        await cargarProveedores();
+
+    } catch (error) {
+
+        mostrarMensaje(
+            error.code === "23505"
+                ? "❌ Ya existe un proveedor con ese código u otro dato único."
+                : "❌ Error: " + error.message, true
+        );
+
+    } finally {
+
+        btnGuardar.disabled = false;
+
+        btnGuardar.textContent =
+            codigoEditar === null
+            ? "💾 Guardar Proveedor"
+            : "💾 Actualizar Proveedor";
     }
 });
+
+// Consultar proveedores
+async function cargarProveedores() {
+
+    const { data, error } = await supabase
+        .from("proveedores")
+        .select("codigo, empresa, representante, encargado, telefono, direccion_empresa, email")
+        .order("codigo", { ascending: true });
+
+    if (error) {
+        mostrarMensaje(
+            "❌ Error al consultar: " + error.message,
+            true
+        );
+        return;
+    }
+
+    proveedores = data || [];
+    mostrarProveedores(proveedores);
+}
+
+// Mostrar proveedores en tabla
+function mostrarProveedores(lista) {
+
+    tabla.replaceChildren();
+
+    if (lista.length === 0) {
+        const fila = tabla.insertRow();
+        const celda = fila.insertCell();
+
+        celda.colSpan = 8;
+        celda.className =
+            "text-center text-slate-400";
+
+        celda.textContent =
+            "No hay proveedores registrados.";
+
+    } else {
+
+        lista.forEach(proveedor => {
+
+            const fila = tabla.insertRow();
+
+            const campos = [
+                proveedor.codigo,
+                proveedor.empresa,
+                proveedor.representante,
+                proveedor.encargado,
+                proveedor.telefono,
+                proveedor.direccion_empresa,
+                proveedor.email
+            ];
+
+            campos.forEach(valor => {
+                const celda = fila.insertCell();
+                celda.textContent = valor ?? "-";
+            });
+
+            const acciones = fila.insertCell();
+
+            const btnEditar =
+                document.createElement("button");
+
+            btnEditar.textContent = "✏️ Editar";
+            btnEditar.className =
+                "bg-blue-600 hover:bg-blue-700 " +
+                "px-3 py-2 rounded-lg mr-2 mb-1";
+
+            btnEditar.addEventListener("click", () => {
+                editarProveedor(proveedor.codigo);
+            });
+
+            const btnEliminar =
+                document.createElement("button");
+
+            btnEliminar.textContent = "🗑️ Eliminar";
+            btnEliminar.className =
+                "bg-red-600 hover:bg-red-700 " +
+                "px-3 py-2 rounded-lg";
+
+            btnEliminar.addEventListener("click", () => {
+                eliminarProveedor(proveedor.codigo);
+            });
+
+            acciones.append(btnEditar, btnEliminar);
+        });
+    }
+
+    document.getElementById(
+        "totalProveedores"
+    ).textContent =
+        "Proveedores mostrados: " + lista.length;
+}
+
+// Editar proveedor
+function editarProveedor(codigo) {
+
+    const proveedor = proveedores.find(
+        p => p.codigo === codigo
+    );
+
+    if (!proveedor) return;
+
+    codigoEditar = codigo;
+
+    document.getElementById("codigo").value =
+        proveedor.codigo;
+    document.getElementById("codigo").readOnly = true;
+
+    document.getElementById("empresa").value =
+        proveedor.empresa || "";
+
+    document.getElementById("representante").value =
+        proveedor.representante || "";
+
+    document.getElementById("encargado").value =
+        proveedor.encargado || "";
+
+    document.getElementById("telefono").value =
+        proveedor.telefono || "";
+
+    document.getElementById("direccion").value =
+        proveedor.direccion_empresa || "";
+
+    document.getElementById("email").value =
+        proveedor.email || "";
+
+    document.getElementById(
+        "tituloFormulario"
+    ).textContent = "✏️ Editar Proveedor";
+
+    btnGuardar.textContent =
+        "💾 Actualizar Proveedor";
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+// Eliminar proveedor
+async function eliminarProveedor(codigo) {
+
+    const confirmar = confirm(
+        "¿Deseas eliminar el proveedor " +
+        codigo + "?"
+    );
+
+    if (!confirmar) return;
+
+    try {
+
+        const { data, error } = await supabase
+            .from("proveedores")
+            .delete()
+            .eq("codigo", codigo)
+            .select("codigo");
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            throw new Error(
+                "No se eliminó ningún registro. " +
+                "Verifica los permisos."
+            );
+        }
+
+        if (codigoEditar === codigo) {
+            limpiarFormulario();
+        }
+
+        mostrarMensaje(
+            "✅ Proveedor eliminado correctamente."
+        );
+
+        await cargarProveedores();
+
+    } catch (error) {
+
+        mostrarMensaje(
+            "❌ Error: " + error.message, true
+        );
+    }
+}
+
+// Buscar proveedores
+buscar.addEventListener("input", () => {
+
+    const texto = buscar.value
+        .toLowerCase()
+        .trim();
+
+    const filtrados = proveedores.filter(p => {
+
+        return [
+            p.codigo,
+            p.empresa,
+            p.representante,
+            p.encargado,
+            p.telefono,
+            p.email
+        ].some(valor =>
+            String(valor ?? "")
+                .toLowerCase()
+                .includes(texto)
+        );
+
+    });
+
+    mostrarProveedores(filtrados);
+});
+
+// Limpiar formulario
+function limpiarFormulario() {
+
+    formulario.reset();
+    codigoEditar = null;
+
+    document.getElementById("codigo").value = "";
+    document.getElementById("codigo").readOnly = false;
+
+    document.getElementById(
+        "tituloFormulario"
+    ).textContent = "➕ Registrar Proveedor";
+
+    btnGuardar.textContent =
+        "💾 Guardar Proveedor";
+}
+
+document.getElementById(
+    "btnCancelar"
+).addEventListener("click", () => {
+    limpiarFormulario();
+    mensaje.textContent = "";
+});
+
+// Cargar proveedores al abrir la página
+cargarProveedores();

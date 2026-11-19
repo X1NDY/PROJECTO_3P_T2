@@ -7,16 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="auth.js"></script>
-    <style>
-        body { background-color: #0b0f19; color: #e2e8f0; }
-        .neon-card { background-color: #111827; border: 1px solid rgba(56, 189, 248, 0.2); box-shadow: 0 0 15px rgba(56, 189, 248, 0.05); }
-        .neon-input { background-color: #1f2937; border: 1px solid #374151; color: #ffffff; }
-        .neon-input:focus { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); outline: none; }
-        .neon-btn { background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%); box-shadow: 0 0 15px rgba(14, 165, 233, 0.4); transition: all 0.3s ease; }
-        .neon-btn:hover { box-shadow: 0 0 25px rgba(14, 165, 233, 0.7); transform: translateY(-1px); }
-        .neon-title { text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
-        .sidebar { background-color: #0f172a; border-right: 1px solid rgba(56, 189, 248, 0.15); }
-    </style>
+    <link rel="stylesheet" href="dashboard.css">
 </head>
 
 <!-- min-h-screen + flex + flex-col + md:flex-row: Estructura adaptable (columna en móvil, fila con barra lateral en PC) -->
@@ -25,46 +16,27 @@
     <!-- Menú Lateral -->
     <aside class="sidebar w-full md:w-64 p-5 flex flex-col justify-between shrink-0">
         <div>
-            <div class="flex items-center justify-between mb-8">
-                <h1 class="text-base font-bold text-sky-400">📦 EJIC Studio</h1>
-            </div>
-            <nav class="space-y-2 text-sm">
-                <a href="index.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">
-                    <span>🏠</span> <span>Inicio</span>
-                </a>
-                <a href="inventario.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/20 font-medium">
-                    <span>📦</span> <span>Inventario</span>
-                </a>
-                <a href="personal.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">
-                    <span>👥</span> <span>Personal</span>
-                </a>
-                <a href="proveedores.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">
-                    <span>🏭</span> <span>Proveedores</span>
-                </a>
-            </nav>
+            <h1 class="text-base font-bold text-sky-400 mb-8">🚀 Traductores e Intérpretes II</h1>
+            <nav class="space-y-2 text-sm" aria-label="Menú principal"><a href="index.html" class="menu-link">🏠 <span>Inicio</span></a>
+<a href="inventario.html" class="menu-link" aria-current="page">📦 <span>Inventario</span></a>
+<a href="personal.html" class="menu-link">👥 <span>Personal</span></a>
+<a href="proveedores.html" class="menu-link">🏭 <span>Proveedores</span></a></nav>
         </div>
-        <div class="hidden md:block pt-4 border-t border-slate-800 text-xs text-slate-500">
-            Traductores e Intérpretes II
-        </div>
+        <p class="mt-8 pt-4 border-t border-slate-800 text-xs text-slate-500">Sistema de Inventario</p>
     </aside>
 
     <!-- Contenedor Principal del Panel -->
-    <div class="flex-1 min-w-0 flex flex-col min-h-screen">
-        <header class="bg-slate-900/60 border-b border-sky-500/10 p-4 flex justify-between items-center">
-            <span class="text-xs text-slate-400">Gestión de Stock en la Nube</span>
+    <div class="flex-1 min-w-0 p-4 md:p-8">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-sky-400">📦 Gestión de Inventario</h1>
+            <p class="text-slate-400 mt-2">Administración y registro de productos del mercadito.</p>
         </header>
-
-        <!-- 
-          GRID ADAPTABLE:
-          - grid-cols-1: En celulares, muestra las secciones una debajo de otra (1 columna).
-          - lg:grid-cols-3: En pantallas grandes (lg), divide el espacio en 3 columnas (1 para el formulario, 2 para la tabla).
-        -->
-        <main class="flex-1 p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <main class="space-y-8">
             
-            <!-- Columna del Formulario (Ocupa 1 espacio en pantallas grandes con lg:col-span-1) -->
-            <section class="neon-card p-6 rounded-xl lg:col-span-1 h-fit">
-                <h2 class="text-lg font-semibold mb-4 text-sky-400">Nuevo Producto</h2>
-                <form id="productForm" class="space-y-4">
+            <!-- Formulario de productos -->
+            <section class="neon-card p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-6 text-sky-400">➕ Registrar Producto</h2>
+                <form id="productForm" class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                         <label for="nombre" class="block text-sm font-medium text-slate-400">Nombre del Producto</label>
                         <input type="text" id="nombre" required class="w-full mt-1 p-2 rounded-lg neon-input">
@@ -77,17 +49,17 @@
                         <label for="precio" class="block text-sm font-medium text-slate-400">Precio (L)</label>
                         <input type="number" step="0.01" id="precio" min="0" required class="w-full mt-1 p-2 rounded-lg neon-input">
                     </div>
-                    <button type="submit" class="w-full text-white p-2 rounded-lg font-semibold neon-btn">
+                    <div class="md:col-span-2 flex flex-wrap gap-3"><button type="submit" class="text-white px-6 py-3 rounded-lg font-bold neon-btn">
                         Guardar Producto
                     </button>
-                <button id="cancelarEdicion" type="button" hidden class="w-full mt-2 p-2 border border-slate-600 rounded-lg">Cancelar edición</button></form>
+                <button id="cancelarEdicion" type="button" hidden class="bg-slate-700 hover:bg-slate-600 px-6 py-3 rounded-lg font-bold">Cancelar edición</button></div></form>
             </section>
 
-            <!-- Columna de la Tabla (Ocupa 2 espacios en pantallas grandes con lg:col-span-2) -->
+            <!-- Listado de productos -->
             <!-- overflow-x-auto permite que si la pantalla es muy pequeña, la tabla se pueda deslizar horizontalmente sin romper el diseño -->
-            <section class="neon-card p-6 rounded-xl lg:col-span-2 overflow-x-auto">
+            <section class="neon-card p-6 rounded-2xl overflow-x-auto">
                 <h2 class="text-lg font-semibold mb-4 text-sky-400">Inventario Actual</h2>
-                <table class="w-full text-left border-collapse">
+                <table class="tabla w-full min-w-[580px] text-left border-collapse">
                     <thead>
                         <tr class="border-b border-slate-800 text-slate-400 text-sm">
                             <th class="pb-2">Producto</th>
