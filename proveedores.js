@@ -36,7 +36,6 @@ function mostrarNotificacion(mensaje, tipo = "success") {
         setTimeout(() => notificacion.remove(), 300);
     }, 4000);
 }
-
 // Obtener datos del formulario
 function obtenerDatos() {
     return {
@@ -45,9 +44,6 @@ function obtenerDatos() {
 
         representante:
             document.getElementById("representante").value.trim(),
-
-        encargado:
-            document.getElementById("encargado").value.trim(),
 
         telefono:
             document.getElementById("telefono").value.trim(),
@@ -66,15 +62,9 @@ formulario.addEventListener("submit", async (e) => {
 
     if (btnGuardar.disabled || !formulario.reportValidity()) return;
 
-    const codigo = document.getElementById("codigo").value.trim();
-    if (!/^[0-9]+$/.test(codigo) || BigInt(codigo) > 9223372036854775807n) {
-        mostrarMensaje("El código debe ser un entero entre 0 y 9223372036854775807.", true);
-        return;
-    }
-
     const datos = obtenerDatos();
     if (!datos.empresa) {
-        mostrarMensaje("Ingresa el nombre de la empresa.", true);
+        mostrarNotificacion("Ingresa el nombre de la empresa.", true);
         return;
     }
 
@@ -88,7 +78,7 @@ formulario.addEventListener("submit", async (e) => {
 
             resultado = await supabase
                 .from("proveedores")
-                .insert([{ codigo, ...datos }]);
+                .insert([datos]);
 
         } else {
 
@@ -118,7 +108,7 @@ formulario.addEventListener("submit", async (e) => {
 
         limpiarFormulario();
 
-        mostrarMensaje(
+        mostrarNotificacion(
             "✅ Proveedor " + accion + " correctamente."
         );
 
@@ -126,7 +116,7 @@ formulario.addEventListener("submit", async (e) => {
 
     } catch (error) {
 
-        mostrarMensaje(
+        mostrarNotificacion(
             error.code === "23505"
                 ? "❌ Ya existe un proveedor con ese código u otro dato único."
                 : "❌ Error: " + error.message, true
@@ -148,11 +138,11 @@ async function cargarProveedores() {
 
     const { data, error } = await supabase
         .from("proveedores")
-        .select("codigo, empresa, representante, encargado, telefono, direccion_empresa, email")
+        .select("codigo, empresa, representante, telefono, direccion_empresa, email")
         .order("codigo", { ascending: true });
 
     if (error) {
-        mostrarMensaje(
+        mostrarNotificacion(
             "❌ Error al consultar: " + error.message,
             true
         );
@@ -189,7 +179,6 @@ function mostrarProveedores(lista) {
                 proveedor.codigo,
                 proveedor.empresa,
                 proveedor.representante,
-                proveedor.encargado,
                 proveedor.telefono,
                 proveedor.direccion_empresa,
                 proveedor.email
@@ -257,9 +246,6 @@ function editarProveedor(codigo) {
     document.getElementById("representante").value =
         proveedor.representante || "";
 
-    document.getElementById("encargado").value =
-        proveedor.encargado || "";
-
     document.getElementById("telefono").value =
         proveedor.telefono || "";
 
@@ -313,7 +299,7 @@ async function eliminarProveedor(codigo) {
             limpiarFormulario();
         }
 
-        mostrarMensaje(
+        mostrarNotificacion(
             "✅ Proveedor eliminado correctamente."
         );
 
@@ -321,7 +307,7 @@ async function eliminarProveedor(codigo) {
 
     } catch (error) {
 
-        mostrarMensaje(
+        mostrarNotificacion(
             "❌ Error: " + error.message, true
         );
     }
@@ -340,7 +326,6 @@ buscar.addEventListener("input", () => {
             p.codigo,
             p.empresa,
             p.representante,
-            p.encargado,
             p.telefono,
             p.email
         ].some(valor =>
@@ -361,7 +346,7 @@ function limpiarFormulario() {
     codigoEditar = null;
 
     document.getElementById("codigo").value = "";
-    document.getElementById("codigo").readOnly = false;
+    document.getElementById("codigo").readOnly = true;
 
     document.getElementById(
         "tituloFormulario"

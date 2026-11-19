@@ -132,13 +132,13 @@
 
                 <div>
                     <label class="block mb-2 text-sm">
-                        Código *
+                        Código
                     </label>
 
                     <input type="text" id="codigo"
-                           class="campo"
-                           inputmode="numeric" pattern="[0-9]+" maxlength="19"
-                           placeholder="Código numérico del proveedor" required>
+                           class="campo" readonly
+                           placeholder="Se genera automáticamente">
+
                 </div>
 
                 <div>
@@ -159,18 +159,7 @@
 
                     <input type="text" id="representante"
                            class="campo"
-                           placeholder="Nombre del representante"
-                           maxlength="150">
-                </div>
-
-                <div>
-                    <label class="block mb-2 text-sm">
-                        Encargado
-                    </label>
-
-                    <input type="text" id="encargado"
-                           class="campo"
-                           placeholder="Nombre del encargado"
+                           placeholder="Nombre del representante o Encargado"
                            maxlength="150">
                 </div>
 
@@ -253,7 +242,6 @@
                             <th>Código</th>
                             <th>Empresa</th>
                             <th>Representante</th>
-                            <th>Encargado</th>
                             <th>Teléfono</th>
                             <th>Dirección</th>
                             <th>Email</th>
