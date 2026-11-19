@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-white flex items-center justify-center p-5">
+
+    <div class="w-full max-w-md bg-slate-900 p-8 rounded-2xl border border-sky-500/30">
+
+        <h1 class="text-3xl font-bold text-sky-400 text-center mb-6">
+            Iniciar sesión
+        </h1>
+
+        <form id="loginForm" class="space-y-5">
+
+            <div>
+                <label class="block mb-2">Correo electrónico</label>
+                <input id="email" type="email" required
+                    class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700">
+            </div>
+
+            <div>
+                <label class="block mb-2">Contraseña</label>
+                <input id="password" type="password" required
+                    class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700">
+            </div>
+
+            <label class="flex items-center gap-2">
+                <input id="remember" type="checkbox" checked>
+                Recordarme
+            </label>
+
+            <button type="submit"
+                class="w-full p-3 rounded-lg bg-sky-600 hover:bg-sky-500 font-bold">
+                Iniciar sesión
+            </button>
+
+        </form>
+
+        <p id="message" class="mt-4 text-center text-sm"></p>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // Datos de conexión de Supabase
+        const SUPABASE_URL = "https://tabxpcvknbhzrcfxviol.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable__-EQTX6HhRPdmydpAjfIQg_plxACJ3x";
+
+        // Crear conexión  
+    const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+);
+
+console.log("Supabase está conectado correctamente");
+
+
+
+// Obtener el formulario
+const loginForm = document.querySelector("form");
+
+// Escuchar cuando se presione Iniciar sesión
+loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const message = document.getElementById("message");
+
+    message.textContent = "Iniciando sesión...";
+    message.style.color = "blue";
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+});
+
+    if (error) {
+        message.textContent = "Correo o contraseña incorrectos.";
+        message.style.color = "red";
+        return;
+    }
+
+    message.textContent = "¡Inicio de sesión exitoso!";
+    message.style.color = "green";
+
+    window.location.href = "index.html";
+});
+
+    </script>
+</body>
+
+</html>

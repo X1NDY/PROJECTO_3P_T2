@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal - Panel Neón</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background-color: #0b0f19; color: #e2e8f0; }
         .neon-card { background-color: #111827; border: 1px solid rgba(56, 189, 248, 0.2); box-shadow: 0 0 15px rgba(56, 189, 248, 0.05); }
@@ -25,6 +24,7 @@
             <a href="index.html" class="flex gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">🏠 <span>Inicio</span></a>
             <a href="inventario.html" class="flex gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">📦 <span>Inventario</span></a>
             <a href="personal.html" aria-current="page" class="flex gap-3 px-3 py-2.5 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/20 font-medium">👥 <span>Personal</span></a>
+            <a href="proveedores.html" class="block px-3 py-2 rounded-lg text-slate-400 hover:text-sky-300">🏭 Proveedores</a>
         </nav>
         <p class="hidden md:block mt-8 pt-4 border-t border-slate-800 text-xs text-slate-500">Traductores e Intérpretes II</p>
     </aside>
@@ -102,7 +102,7 @@
             </section>
         </main>
     </div>
-    <!-- Archivo independiente: utiliza la misma configuración de Supabase que app.js. -->
-    <script src="personal.js"></script>
+    <!-- Comparte la conexión de conexion.js con Proveedores. -->
+    <script type="module" src="personal.js"></script>
 </body>
 </html>
