@@ -18,12 +18,23 @@ const btnGuardar =
 let codigoEditar = null;
 let proveedores = [];
 
-// Mostrar mensajes
-function mostrarMensaje(texto, error = false) {
-    mensaje.textContent = texto;
-    mensaje.className = error
-        ? "mt-5 text-sm text-red-400"
-        : "mt-5 text-sm text-green-400";
+/* ==========================================================================
+   PASO 2: NOTIFICACIONES VISUALES NEÓN
+   ========================================================================== */
+function mostrarNotificacion(mensaje, tipo = "success") {
+    const notificacion = document.createElement("div");
+    const colorFondo = tipo === "success"
+        ? "bg-emerald-950/90 border-emerald-500/50 text-emerald-300"
+        : "bg-red-950/90 border-red-500/50 text-red-300";
+    notificacion.className = `fixed bottom-5 left-5 right-5 md:left-auto md:max-w-md z-50 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur text-sm transition-all duration-300 ${colorFondo}`;
+    notificacion.setAttribute("role", tipo === "success" ? "status" : "alert");
+    // textContent muestra los datos como texto y evita interpretar código HTML.
+    notificacion.textContent = mensaje;
+    document.body.appendChild(notificacion);
+    setTimeout(() => {
+        notificacion.style.opacity = "0";
+        setTimeout(() => notificacion.remove(), 300);
+    }, 4000);
 }
 
 // Obtener datos del formulario
