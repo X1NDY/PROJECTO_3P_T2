@@ -4,54 +4,84 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="auth.js"></script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name = "vieweport" content="width-width, initial-scale=1.0">
     <title>Inicio - Sistema de Inventario </title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="dashboard.css">
+    <script src="https://cdn.tailwindcss.com/"></script>
+
+    <style>
+        /* Estructura general de la pagina (oscuro y texto claro) */
+        body { background-color: #0b0f19; color: #e2e8f0;}
+
+        /* Resplando futurista */
+        .neon-card{
+            background-color: #111827; color: #e2e8f0 ;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+        }
+
+        /* Estilo de botones */
+        .neon-btn{
+            background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+            transition: all 0.3s ease;
+        }
+        .neon-btn:hover{
+            box-shadow: 0 0 25px rgba(14, 165, 233, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .neon-title { text-shadow: 0 0 15px rgba(56, 189, 248, 0.5); }
+
+        /* menu lateral fijo */
+        .sidebar { background-color: #0f172a; border-right: 1px solid rgba(56, 189, 248, 0.15); }
+    </style>
 
 </head>
 <!--
 min-h-screen: Ocupa toda la altura
 flex flex-col md:flex-row>: Columna en celular, fija en PC(menu izquierda)
 -->
-
+<script type="module" src="app.js"></script>
 <body class="min-h-screen flex flex-col md:flex-row">
    <!--Menu Lateral izquier(Sidebar)-->
-   <aside class="sidebar w-full md:w-64 p-5 flex flex-col justify-between shrink-0">
+   <aside class="sidebar w-full md:w-64 p-5 flex flex-col justify-between shrink-0 " >
         <div>
-            <h1 class="text-base font-bold text-sky-400 mb-8">🚀 Traductores e Intérpretes II</h1>
-            <nav class="space-y-2 text-sm" aria-label="Menú principal"><a href="index.html" class="menu-link" aria-current="page">🏠 <span>Inicio</span></a>
-<a href="inventario.html" class="menu-link">📦 <span>Inventario</span></a>
-<a href="personal.html" class="menu-link">👥 <span>Personal</span></a>
-<a href="proveedores.html" class="menu-link">🏭 <span>Proveedores</span></a></nav>
+            <div class="flex items-center justify-between mb-8">
+                <h1 class="text-base font-bold text-sky-400"> 🚀 Traductores e Interpretes II </h1>
+                <!-- Boton de login para vista de dispositivos mobiles -->
+                <a href="login.html" class="md:hidden font-bold text-xs bg-sky-500/10 text-sky-300 border border-sky-500/30 px-2.5 py-1 rounded-lg">Login</a>
+            </div>
+
+                 <!-- Enlaces de navegacion del Menu-->
+            <nav class="space-y-2 text-ms">
+                    <pan>🏠</pan> <pan>Inicio</pan>
+                <a href="inventario.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">
+                    <span>📦</span> <pan>Inventario</pan>
+                </a>
+                <a href="personal.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">
+                    <span>👥</span> <pan>Personal</pan>
+                </a>
+                <a href="proveedores.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">
+                    <span>🏭</span> <pan>Proveedores</pan>
+                </a>
+            </nav>
         </div>
-        <p class="mt-8 pt-4 border-t border-slate-800 text-xs text-slate-500">Sistema de Inventario</p>
     </aside>
     <!-- contenido central con mensaje -->
-     <main class="flex-1 p-4 md:p-8 min-w-0">
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-sky-400">🏠 Panel de Inicio</h1>
-            <p class="text-slate-400 mt-2">Bienvenido al sistema de administración del mercadito.</p>
-        </header>
-        <section class="grid grid-cols-1 xl:grid-cols-3 gap-6" aria-label="Módulos del sistema"><a href="inventario.html" class="neon-card p-6 rounded-2xl block hover:border-sky-400 transition">
-                <span class="text-3xl" aria-hidden="true">📦</span>
-                <h2 class="text-xl font-bold text-sky-400 mt-4">Inventario</h2>
-                <p class="text-slate-400 mt-2">Consulta y administra los productos del mercadito.</p>
-                <span class="inline-block text-sky-300 mt-5">Abrir inventario →</span>
-            </a>
-<a href="personal.html" class="neon-card p-6 rounded-2xl block hover:border-sky-400 transition">
-                <span class="text-3xl" aria-hidden="true">👥</span>
-                <h2 class="text-xl font-bold text-sky-400 mt-4">Personal</h2>
-                <p class="text-slate-400 mt-2">Registra, edita y elimina los datos del personal.</p>
-                <span class="inline-block text-sky-300 mt-5">Abrir personal →</span>
-            </a>
-<a href="proveedores.html" class="neon-card p-6 rounded-2xl block hover:border-sky-400 transition">
-                <span class="text-3xl" aria-hidden="true">🏭</span>
-                <h2 class="text-xl font-bold text-sky-400 mt-4">Proveedores</h2>
-                <p class="text-slate-400 mt-2">Administra las empresas y los contactos de proveedores.</p>
-                <span class="inline-block text-sky-300 mt-5">Abrir proveedores →</span>
-            </a></section>
-    </main>
+     <main class="flex-1 p-6 flex items-center justify-center">
+        <div class="max-w-xl w-full neon-card p-8 rounded-2x1 text-center space-y-6">
+            <span class="text-4xl">🚀</span>
+
+            <!--  Titulo del mensaje -->
+            <h2 class="text-2xl md:text-3xl font-extrabold text-sky-400 neon-title leading-snug">
+                Bienvenido a nuestra Web Traductores e Interpretes II
+            </h2>
+
+            <p class="text-slate-400 text-ms loading-relaxed">
+                Estamos dando inicio a esta gran aventura de Desarrollo, aqui conectaremos nuestro responsi con la base de datos (Supabase)
+            </p>
+        </div>
+     </main>
 </body>
 
 </html>

@@ -7,31 +7,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal - Panel Neón</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        body { background-color: #0b0f19; color: #e2e8f0; }
+        .neon-card { background-color: #111827; border: 1px solid rgba(56, 189, 248, 0.2); box-shadow: 0 0 15px rgba(56, 189, 248, 0.05); }
+        .neon-input { background-color: #1f2937; border: 1px solid #374151; color: #ffffff; }
+        .neon-input:focus { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); outline: none; }
+        .neon-btn { background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%); box-shadow: 0 0 15px rgba(14, 165, 233, 0.4); transition: all 0.3s ease; }
+        .neon-btn:hover { box-shadow: 0 0 25px rgba(14, 165, 233, 0.7); transform: translateY(-1px); }
+        .sidebar { background-color: #0f172a; border-right: 1px solid rgba(56, 189, 248, 0.15); }
+        button:disabled { opacity: 0.6; cursor: wait; }
+    </style>
 </head>
 <!-- Estructura adaptable: columna en móvil y menú lateral en computadora. -->
 <body class="min-h-screen flex flex-col md:flex-row">
-    <aside class="sidebar w-full md:w-64 p-5 flex flex-col justify-between shrink-0">
-        <div>
-            <h1 class="text-base font-bold text-sky-400 mb-8">🚀 Traductores e Intérpretes II</h1>
-            <nav class="space-y-2 text-sm" aria-label="Menú principal"><a href="index.html" class="menu-link">🏠 <span>Inicio</span></a>
-<a href="inventario.html" class="menu-link">📦 <span>Inventario</span></a>
-<a href="personal.html" class="menu-link" aria-current="page">👥 <span>Personal</span></a>
-<a href="proveedores.html" class="menu-link">🏭 <span>Proveedores</span></a></nav>
-        </div>
-        <p class="mt-8 pt-4 border-t border-slate-800 text-xs text-slate-500">Sistema de Inventario</p>
+    <aside class="sidebar w-full md:w-64 p-5 shrink-0">
+        <h1 class="text-base font-bold text-sky-400 mb-8">📦 EJIC Studio</h1>
+        <nav class="space-y-2 text-sm" aria-label="Menú principal">
+            <a href="index.html" class="flex gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">🏠 <span>Inicio</span></a>
+            <a href="inventario.html" class="flex gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">📦 <span>Inventario</span></a>
+            <a href="personal.html" aria-current="page" class="flex gap-3 px-3 py-2.5 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/20 font-medium">👥 <span>Personal</span></a>
+            <a href="proveedores.html" class="block px-3 py-2 rounded-lg text-slate-400 hover:text-sky-300">🏭 Proveedores</a>
+        </nav>
+        <p class="hidden md:block mt-8 pt-4 border-t border-slate-800 text-xs text-slate-500">Traductores e Intérpretes II</p>
     </aside>
 
-    <div class="flex-1 min-w-0 p-4 md:p-8">
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-sky-400">👥 Gestión de Personal</h1>
-            <p class="text-slate-400 mt-2">Administración y registro del personal del mercadito.</p>
+    <div class="flex-1 min-w-0 flex flex-col min-h-screen">
+        <header class="bg-slate-900/60 border-b border-sky-500/10 p-4">
+            <h1 class="text-sm text-slate-400">Gestión de Personal en la Nube</h1>
         </header>
-        <main class="space-y-8">
+        <main class="flex-1 p-4 md:p-6 grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
             <!-- Formulario de registro con los campos obligatorios del personal. -->
-            <section class="neon-card p-6 rounded-2xl">
-                <h2 id="tituloPersonal" class="text-xl font-bold mb-6 text-sky-400">➕ Registrar Personal</h2>
-                <form id="personalForm" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <section class="neon-card p-6 rounded-xl">
+                <h2 class="text-lg font-semibold mb-4 text-sky-400">Nuevo Personal</h2>
+                <form id="personalForm" class="space-y-4">
                     <div>
                         <label for="identidad" class="block text-sm font-medium text-slate-400">Identidad</label>
                         <input type="text" id="identidad" name="identidad" maxlength="30" required class="w-full mt-1 p-2 rounded-lg neon-input" aria-describedby="identidadAyuda">
@@ -63,15 +71,12 @@
                         <label for="direccion" class="block text-sm font-medium text-slate-400">Dirección</label>
                         <textarea id="direccion" name="direccion" autocomplete="street-address" rows="3" maxlength="500" required class="w-full mt-1 p-2 rounded-lg neon-input"></textarea>
                     </div>
-                    <div class="md:col-span-2 flex flex-wrap gap-3">
-                        <button id="guardarPersonal" type="submit" class="text-white px-6 py-3 rounded-lg font-bold neon-btn">Guardar Personal</button>
-                        <button id="cancelarPersonal" type="button" hidden class="bg-slate-700 hover:bg-slate-600 px-6 py-3 rounded-lg font-bold">Cancelar edición</button>
-                    </div>
+                    <button id="guardarPersonal" type="submit" class="w-full text-white p-2 rounded-lg font-semibold neon-btn">Guardar Personal</button>
                 </form>
             </section>
 
             <!-- El desplazamiento horizontal mantiene la tabla dentro de la pantalla. -->
-            <section class="neon-card p-6 rounded-2xl min-w-0">
+            <section class="neon-card p-4 md:p-6 rounded-xl xl:col-span-2 min-w-0">
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <div>
                         <h2 class="text-lg font-semibold text-sky-400">Personal Registrado</h2>
@@ -80,7 +85,7 @@
                     <button id="recargarPersonal" type="button" class="text-sm text-sky-300 border border-sky-500/30 px-3 py-2 rounded-lg hover:bg-sky-500/10">Actualizar</button>
                 </div>
                 <div class="overflow-x-auto" role="region" aria-label="Listado de personal" tabindex="0">
-                    <table class="tabla w-full min-w-[820px] text-left border-collapse text-sm">
+                    <table class="w-full min-w-[680px] text-left border-collapse text-sm">
                         <caption class="sr-only">Datos del personal registrado en Supabase</caption>
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400">
@@ -89,11 +94,10 @@
                                 <th scope="col" class="pb-3 px-3">Género</th>
                                 <th scope="col" class="pb-3 px-3">Teléfono</th>
                                 <th scope="col" class="pb-3 px-3">Dirección</th>
-                                <th scope="col">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="personalTableBody" class="divide-y divide-slate-800/60">
-                            <tr><td colspan="6" class="py-6 text-center text-slate-400">Cargando personal desde Supabase...</td></tr>
+                            <tr><td colspan="5" class="py-6 text-center text-slate-400">Cargando personal desde Supabase...</td></tr>
                         </tbody>
                     </table>
                 </div>
