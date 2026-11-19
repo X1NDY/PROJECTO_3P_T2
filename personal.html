@@ -15,6 +15,13 @@
         .neon-btn { background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%); box-shadow: 0 0 15px rgba(14, 165, 233, 0.4); transition: all 0.3s ease; }
         .neon-btn:hover { box-shadow: 0 0 25px rgba(14, 165, 233, 0.7); transform: translateY(-1px); }
         .sidebar { background-color: #0f172a; border-right: 1px solid rgba(56, 189, 248, 0.15); }
+        .boton-editar, .boton-eliminar { padding: 8px 12px; border-radius: 8px; margin: 0 6px 4px 0; color: white; }
+        .boton-editar { background-color: #2563eb; }
+        .boton-editar:hover { background-color: #1d4ed8; }
+        .boton-eliminar { background-color: #dc2626; }
+        .boton-eliminar:hover { background-color: #b91c1c; }
+        input[readonly] { opacity: 0.65; }
+        button[hidden] { display: none; }
         button:disabled { opacity: 0.6; cursor: wait; }
     </style>
 </head>
@@ -37,7 +44,7 @@
         <main class="flex-1 p-4 md:p-6 grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
             <!-- Formulario de registro con los campos obligatorios del personal. -->
             <section class="neon-card p-6 rounded-xl">
-                <h2 class="text-lg font-semibold mb-4 text-sky-400">Nuevo Personal</h2>
+                <h2 id="tituloPersonal" class="text-lg font-semibold mb-4 text-sky-400">➕ Registrar Personal</h2>
                 <form id="personalForm" class="space-y-4">
                     <div>
                         <label for="identidad" class="block text-sm font-medium text-slate-400">Identidad</label>
@@ -71,6 +78,7 @@
                         <textarea id="direccion" name="direccion" autocomplete="street-address" rows="3" maxlength="500" required class="w-full mt-1 p-2 rounded-lg neon-input"></textarea>
                     </div>
                     <button id="guardarPersonal" type="submit" class="w-full text-white p-2 rounded-lg font-semibold neon-btn">Guardar Personal</button>
+                    <button id="cancelarPersonal" type="button" hidden class="w-full p-2 rounded-lg border border-slate-600 hover:bg-slate-800">Cancelar edición</button>
                 </form>
             </section>
 
@@ -84,7 +92,7 @@
                     <button id="recargarPersonal" type="button" class="text-sm text-sky-300 border border-sky-500/30 px-3 py-2 rounded-lg hover:bg-sky-500/10">Actualizar</button>
                 </div>
                 <div class="overflow-x-auto" role="region" aria-label="Listado de personal" tabindex="0">
-                    <table class="w-full min-w-[680px] text-left border-collapse text-sm">
+                    <table class="w-full min-w-[820px] text-left border-collapse text-sm">
                         <caption class="sr-only">Datos del personal registrado en Supabase</caption>
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400">
@@ -93,10 +101,11 @@
                                 <th scope="col" class="pb-3 px-3">Género</th>
                                 <th scope="col" class="pb-3 px-3">Teléfono</th>
                                 <th scope="col" class="pb-3 px-3">Dirección</th>
+                                <th scope="col" class="pb-3 px-3">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="personalTableBody" class="divide-y divide-slate-800/60">
-                            <tr><td colspan="5" class="py-6 text-center text-slate-400">Cargando personal desde Supabase...</td></tr>
+                            <tr><td colspan="6" class="py-6 text-center text-slate-400">Cargando personal desde Supabase...</td></tr>
                         </tbody>
                     </table>
                 </div>
